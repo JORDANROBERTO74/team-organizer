@@ -41,6 +41,7 @@ export async function createSectorAction(formData: {
       icon: formData.icon || "Building2",
       description: null,
       color: null,
+      priority: "Media", // Prioridad por defecto
     });
     revalidatePath("/dashboard");
     return { success: true, data: sector };
