@@ -269,30 +269,10 @@ export function ScheduleForm({
       setGroupConfigs(configs);
       setNotes(initialSchedule.notes || "");
     } else if (!initialSchedule && groups.length > 0) {
-      // Modo creación: seleccionar todos los grupos por defecto
-      const allGroupIds = groups.map((g) => g.id);
-      setSelectedGroupIds(allGroupIds);
+      setSelectedGroupIds([]);
 
-      // Inicializar configuraciones vacías para todos los grupos
-      const initialConfigs: Record<string, GroupConfig> = {};
-      allGroupIds.forEach((groupId) => {
-        const config: GroupConfig = {
-          memberAssignments: {},
-          sectorRequirements: {},
-        };
-
-        // Inicializar requerimientos con 0 para todos los sectores
-        if (sectors.length > 0) {
-          const initialRequirements: Record<string, number> = {};
-          sectors.forEach((sector) => {
-            initialRequirements[sector.id] = 0;
-          });
-          config.sectorRequirements = initialRequirements;
-        }
-
-        initialConfigs[groupId] = config;
-      });
-      setGroupConfigs(initialConfigs);
+      // Inicializar configuraciones vacías (solo se crearán cuando se seleccione un grupo)
+      setGroupConfigs({});
       setNotes("");
     }
   }, [open, initialSchedule, groups, slots, sectors]);

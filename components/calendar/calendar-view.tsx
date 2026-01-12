@@ -409,10 +409,10 @@ export function CalendarView({
 
     return (
       <>
-        {/* Días de la semana en filas de 3 */}
+        {/* Días de la semana - columna en mobile, grid en desktop */}
         <div className="flex flex-col gap-4 w-full">
           {dayRows.map((row, rowIndex) => (
-            <div key={rowIndex} className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 w-full min-h-[300px]">
+            <div key={rowIndex} className="flex flex-col md:grid md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 w-full min-h-[300px]">
               {row.map((date) => {
                 const dateKey = formatDateKey(date);
                 const daySchedules = schedulesByDate.get(dateKey) || [];
@@ -450,9 +450,9 @@ export function CalendarView({
 
     return (
       <>
-        {/* 3 días en una fila */}
+        {/* 3 días - columna en mobile, grid en desktop */}
         <div className="flex flex-col gap-4 w-full">
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 w-full min-h-[500px]">
+          <div className="flex flex-col md:grid md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 w-full min-h-[500px]">
             {days.map((date) => {
               const dateKey = formatDateKey(date);
               const daySchedules = schedulesByDate.get(dateKey) || [];

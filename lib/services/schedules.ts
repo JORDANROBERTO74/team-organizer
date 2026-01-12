@@ -124,7 +124,7 @@ export async function getSchedulesWithDetails(
   try {
     const userSlots = await getUserGroupSlots();
     userGroupSlotsMap = new Map(
-      userSlots.map((slot: GroupSlot) => [slot.slot_label, null])
+      userSlots.map((slot: GroupSlot) => [slot.slot_label, slot.priority || null])
     );
   } catch (error) {
     console.error("Error al obtener group_slots para priority:", error);

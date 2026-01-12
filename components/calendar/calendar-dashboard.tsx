@@ -21,6 +21,7 @@ import {
   Trash2,
   Share2,
   Copy,
+  Clock,
 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -562,10 +563,52 @@ export function CalendarDashboard({
                       const groupId = group?.id;
 
                       // Obtener miembros de este grupo que tienen asignaciones
-                      const groupMembers =
+                      const groupMembersRaw =
                         selectedSchedule.member_assignments?.filter(
                           (assignment) => assignment.member.group_id === groupId
                         ) || [];
+
+                      // Función helper para obtener el valor numérico de priority para ordenar
+                      const getPriorityValue = (priority: string | null | undefined): number => {
+                        if (!priority) return 999; // Sin priority va al final
+                        switch (priority) {
+                          case "Alta":
+                            return 1;
+                          case "Media":
+                            return 2;
+                          case "Baja":
+                            return 3;
+                          default:
+                            return 999;
+                        }
+                      };
+
+                      // Ordenar miembros por prioridad del sector primero, luego por nombre del sector
+                      const groupMembers = [...groupMembersRaw].sort((a, b) => {
+                        const sectorA = a.sector;
+                        const sectorB = b.sector;
+                        
+                        // Si ambos tienen sector, ordenar por prioridad primero
+                        if (sectorA && sectorB) {
+                          const priorityA = getPriorityValue(sectorA.priority);
+                          const priorityB = getPriorityValue(sectorB.priority);
+                          
+                          // Si tienen diferente prioridad, ordenar por prioridad
+                          if (priorityA !== priorityB) {
+                            return priorityA - priorityB;
+                          }
+                          
+                          // Si tienen la misma prioridad, ordenar por nombre del sector
+                          return sectorA.name.localeCompare(sectorB.name);
+                        }
+                        
+                        // Si solo uno tiene sector, el que tiene sector va primero
+                        if (sectorA && !sectorB) return -1;
+                        if (!sectorA && sectorB) return 1;
+                        
+                        // Si ninguno tiene sector, mantener orden original
+                        return 0;
+                      });
 
                       return (
                         <Card
@@ -581,14 +624,37 @@ export function CalendarDashboard({
                                 >
                                   {group?.name || "Sin grupo"}
                                 </Badge>
-                                {groupSlot.slot_label && (
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-xs font-normal"
-                                  >
-                                    {groupSlot.slot_label}
-                                  </Badge>
-                                )}
+                                {groupSlot.slot_label && (() => {
+                                  const slotIconName = groupSlot.icon;
+                                  
+                                  // Obtener el componente de icono del slot
+                                  const getSlotIconComponent = (): LucideIcon => {
+                                    if (!slotIconName) return Clock;
+                                    try {
+                                      const IconComponent = (
+                                        LucideIcons as unknown as Record<
+                                          string,
+                                          LucideIcon
+                                        >
+                                      )[slotIconName];
+                                      return IconComponent || Clock;
+                                    } catch {
+                                      return Clock;
+                                    }
+                                  };
+
+                                  const SlotIconComponent = getSlotIconComponent();
+
+                                  return (
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-xs font-normal flex items-center gap-1.5"
+                                    >
+                                      <SlotIconComponent className="h-3 w-3" />
+                                      {groupSlot.slot_label}
+                                    </Badge>
+                                  );
+                                })()}
                               </div>
                             </div>
 

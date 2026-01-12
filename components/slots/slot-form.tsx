@@ -18,6 +18,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { IconPicker } from "@/components/ui/icon-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import type { GroupSlot } from "@/lib/types/database";
 
@@ -40,6 +47,7 @@ export function SlotForm({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [icon, setIcon] = useState<string>(slot?.icon || DEFAULT_SLOT_ICON);
+  const [priority, setPriority] = useState<string>(slot?.priority || "");
   const formRef = useRef<HTMLFormElement>(null);
 
   const isEditing = !!slot;
@@ -53,9 +61,11 @@ export function SlotForm({
     if (isEditing && slot) {
       // Al editar, mantener el icono existente
       setIcon(slot.icon || DEFAULT_SLOT_ICON);
+      setPriority(slot.priority || "");
     } else {
       // Al crear, usar el icono por defecto
       setIcon(DEFAULT_SLOT_ICON);
+      setPriority("");
     }
     setError(null); // Limpiar errores al abrir el diálogo
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,6 +77,7 @@ export function SlotForm({
 
     const formData = new FormData(e.currentTarget);
     const slot_label = formData.get("slot_label") as string;
+    const priorityValue = priority || (formData.get("priority") as string);
     const description = formData.get("description") as string | null;
 
     if (!slot_label || slot_label.trim() === "") {
@@ -80,11 +91,17 @@ export function SlotForm({
       return;
     }
 
+    if (!priorityValue || priorityValue.trim() === "") {
+      setError("La prioridad es requerida");
+      return;
+    }
+
     startTransition(async () => {
       try {
         setError(null);
         const actionFormData = new FormData();
         actionFormData.append("slot_label", trimmedLabel);
+        actionFormData.append("priority", priorityValue.trim());
         // Usar el icono seleccionado o el por defecto
         actionFormData.append("icon", icon || DEFAULT_SLOT_ICON);
         // Agregar descripción si existe
@@ -178,6 +195,26 @@ export function SlotForm({
               <p className="text-xs text-muted-foreground">
                 Máximo 40 caracteres
               </p>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="priority">Prioridad *</Label>
+              <Select
+                value={priority}
+                onValueChange={setPriority}
+                required
+                disabled={isPending}
+              >
+                <SelectTrigger id="priority" className="w-full">
+                  <SelectValue placeholder="Selecciona una prioridad" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Alta">Alta</SelectItem>
+                  <SelectItem value="Media">Media</SelectItem>
+                  <SelectItem value="Baja">Baja</SelectItem>
+                </SelectContent>
+              </Select>
+              <input type="hidden" name="priority" value={priority} />
             </div>
 
             <div className="grid gap-2">

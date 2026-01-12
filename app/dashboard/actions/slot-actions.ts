@@ -26,6 +26,7 @@ export async function createSlotAction(formData: FormData) {
   try {
     // Solo obtener los campos que necesitamos, ignorar cualquier otro campo
     const slot_label = formData.get("slot_label") as string;
+    const priority = formData.get("priority") as string;
     const icon = formData.get("icon") as string | null;
     const description = formData.get("description") as string | null;
 
@@ -44,6 +45,21 @@ export async function createSlotAction(formData: FormData) {
       };
     }
 
+    if (!priority || priority.trim() === "") {
+      return {
+        success: false,
+        error: "La prioridad es requerida",
+      };
+    }
+
+    const trimmedPriority = priority.trim();
+    if (!["Alta", "Media", "Baja"].includes(trimmedPriority)) {
+      return {
+        success: false,
+        error: "La prioridad debe ser Alta, Media o Baja",
+      };
+    }
+
     // Validar que el icono no sea demasiado largo
     const trimmedIcon = icon?.trim() || "Clock";
     if (trimmedIcon.length > 50) {
@@ -55,6 +71,7 @@ export async function createSlotAction(formData: FormData) {
 
     const slotData: Omit<GroupSlotInsert, "user_id"> = {
       slot_label: trimmedLabel,
+      priority: trimmedPriority,
       icon: trimmedIcon,
       description: description?.trim() || null,
     };
@@ -99,6 +116,7 @@ export async function createSlotAction(formData: FormData) {
 export async function updateSlotAction(slotId: string, formData: FormData) {
   try {
     const slot_label = formData.get("slot_label") as string;
+    const priority = formData.get("priority") as string;
     const icon = formData.get("icon") as string | null;
     const description = formData.get("description") as string | null;
 
@@ -118,8 +136,24 @@ export async function updateSlotAction(slotId: string, formData: FormData) {
       };
     }
 
+    if (!priority || priority.trim() === "") {
+      return {
+        success: false,
+        error: "La prioridad es requerida",
+      };
+    }
+
+    const trimmedPriority = priority.trim();
+    if (!["Alta", "Media", "Baja"].includes(trimmedPriority)) {
+      return {
+        success: false,
+        error: "La prioridad debe ser Alta, Media o Baja",
+      };
+    }
+
     const updates: Partial<Omit<GroupSlotInsert, "user_id">> = {
       slot_label: trimmedLabel,
+      priority: trimmedPriority,
     };
 
     if (icon !== null) {
