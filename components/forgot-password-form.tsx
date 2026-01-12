@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { usePasswordReset } from "@/hooks/auth/use-password-reset";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,28 +20,11 @@ export function ForgotPasswordForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { resetPassword, isLoading, error, success } = usePasswordReset();
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // The url which will be included in the email. This URL needs to be configured in your redirect URLs in the Supabase dashboard at https://supabase.com/dashboard/project/_/auth/url-configuration
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
-      });
-      if (error) throw error;
-      setSuccess(true);
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+    await resetPassword(email);
   };
 
   return (
@@ -50,22 +33,22 @@ export function ForgotPasswordForm({
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">Check Your Email</CardTitle>
-            <CardDescription>Password reset instructions sent</CardDescription>
+            <CardDescription>Instrucciones de recuperación enviadas</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              If you registered using your email and password, you will receive
-              a password reset email.
+              Si te registraste con tu correo electrónico y contraseña, recibirás
+              un correo para restablecer tu contraseña.
             </p>
           </CardContent>
         </Card>
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Reset Your Password</CardTitle>
+            <CardTitle className="text-2xl">Restablecer Contraseña</CardTitle>
             <CardDescription>
-              Type in your email and we&apos;ll send you a link to reset your
-              password
+              Ingresa tu correo electrónico y te enviaremos un enlace para restablecer
+              tu contraseña
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -84,7 +67,7 @@ export function ForgotPasswordForm({
                 </div>
                 {error && <p className="text-sm text-red-500">{error}</p>}
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send reset email"}
+                  {isLoading ? "Enviando..." : "Enviar correo de recuperación"}
                 </Button>
               </div>
               <div className="mt-4 text-center text-sm">

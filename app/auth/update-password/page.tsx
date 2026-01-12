@@ -1,4 +1,14 @@
+import type { Metadata } from "next";
 import { UpdatePasswordForm } from "@/components/update-password-form";
+
+export const metadata: Metadata = {
+  title: "Actualizar Contraseña",
+  description: "Actualiza tu contraseña de acceso a Organizador de Equipos",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function Page() {
   return (

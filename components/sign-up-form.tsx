@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { useSignUp } from "@/hooks/auth/use-signup";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,7 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function SignUpForm({
@@ -23,36 +22,21 @@ export function SignUpForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+  const { signUp, isLoading, error: signUpError } = useSignUp();
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
     setError(null);
 
     if (password !== repeatPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
+      setError("Las contraseñas no coinciden");
       return;
     }
 
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
-        },
-      });
-      if (error) throw error;
-      router.push("/auth/sign-up-success");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
+    const result = await signUp(email, password);
+    if (!result.success && result.error) {
+      setError(result.error);
     }
   };
 
@@ -101,9 +85,11 @@ export function SignUpForm({
                   onChange={(e) => setRepeatPassword(e.target.value)}
                 />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {(error || signUpError) && (
+                <p className="text-sm text-red-500">{error || signUpError}</p>
+              )}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating an account..." : "Sign up"}
+                {isLoading ? "Creando cuenta..." : "Registrarse"}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">

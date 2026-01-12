@@ -1,4 +1,14 @@
+import type { Metadata } from "next";
 import { SignUpForm } from "@/components/sign-up-form";
+
+export const metadata: Metadata = {
+  title: "Crear Cuenta",
+  description: "Crea tu cuenta gratuita en Organizador de Equipos y comienza a gestionar tus equipos de trabajo",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function Page() {
   return (

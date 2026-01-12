@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   Card,
   CardContent,
@@ -5,6 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
+export const metadata: Metadata = {
+  title: "Registro Exitoso",
+  description: "Tu cuenta ha sido creada exitosamente. Verifica tu correo electrónico para continuar",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function Page() {
   return (

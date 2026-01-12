@@ -21,11 +21,20 @@ const ThemeSwitcher = () => {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return null;
-  }
-
   const ICON_SIZE = 16;
+
+  // Always render a placeholder button with the same structure to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <Button variant="ghost" size={"sm"} aria-label="Theme switcher">
+        <Laptop
+          size={ICON_SIZE}
+          className={"text-muted-foreground opacity-0"}
+          aria-hidden="true"
+        />
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>
