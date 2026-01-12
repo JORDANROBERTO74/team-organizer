@@ -25,6 +25,7 @@ export async function loadUserSectors() {
 export async function createSectorAction(formData: FormData) {
   try {
     const name = formData.get("name") as string;
+    const priority = formData.get("priority") as string;
     const icon = formData.get("icon") as string | null;
     const color = formData.get("color") as string | null;
     const description = formData.get("description") as string | null;
@@ -41,6 +42,21 @@ export async function createSectorAction(formData: FormData) {
       return {
         success: false,
         error: "El nombre del sector no puede tener más de 100 caracteres",
+      };
+    }
+
+    if (!priority || priority.trim() === "") {
+      return {
+        success: false,
+        error: "La prioridad es requerida",
+      };
+    }
+
+    const trimmedPriority = priority.trim();
+    if (!["Alta", "Media", "Baja"].includes(trimmedPriority)) {
+      return {
+        success: false,
+        error: "La prioridad debe ser Alta, Media o Baja",
       };
     }
 
@@ -76,6 +92,7 @@ export async function createSectorAction(formData: FormData) {
 
     const sectorData: Omit<SectorInsert, "user_id"> = {
       name: trimmedName,
+      priority: trimmedPriority,
       icon: trimmedIcon,
       color: trimmedColor,
       description: description?.trim() || null,
@@ -118,6 +135,7 @@ export async function updateSectorAction(
 ) {
   try {
     const name = formData.get("name") as string;
+    const priority = formData.get("priority") as string;
     const icon = formData.get("icon") as string | null;
     const color = formData.get("color") as string | null;
     const description = formData.get("description") as string | null;
@@ -130,8 +148,24 @@ export async function updateSectorAction(
       };
     }
 
+    if (!priority || priority.trim() === "") {
+      return {
+        success: false,
+        error: "La prioridad es requerida",
+      };
+    }
+
+    const trimmedPriority = priority.trim();
+    if (!["Alta", "Media", "Baja"].includes(trimmedPriority)) {
+      return {
+        success: false,
+        error: "La prioridad debe ser Alta, Media o Baja",
+      };
+    }
+
     const updates: Partial<Omit<SectorInsert, "user_id">> = {
       name: name.trim(),
+      priority: trimmedPriority,
     };
 
     if (icon !== null) {

@@ -20,6 +20,7 @@ export type Sector = {
   icon: string | null;
   color: string | null;
   description: string | null;
+  priority: string | null;
   created_at: string;
 };
 
@@ -29,6 +30,7 @@ export type GroupSlot = {
   slot_label: string;
   icon: string | null;
   description: string | null;
+  priority: string | null;
   created_at: string;
 };
 

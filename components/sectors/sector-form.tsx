@@ -18,6 +18,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { IconPicker } from "@/components/ui/icon-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import type { Sector } from "@/lib/types/database";
 
@@ -59,6 +66,7 @@ export function SectorForm({
   const [color, setColor] = useState<string>(
     sector?.color || generateRandomColor()
   );
+  const [priority, setPriority] = useState<string>(sector?.priority || "");
   const formRef = useRef<HTMLFormElement>(null);
 
   const isEditing = !!sector;
@@ -67,13 +75,15 @@ export function SectorForm({
   useEffect(() => {
     if (open) {
       if (isEditing) {
-        // Al editar, mantener el icono y color existentes
+        // Al editar, mantener el icono, color y prioridad existentes
         setIcon(sector?.icon || DEFAULT_SECTOR_ICON);
         setColor(sector?.color || generateRandomColor());
+        setPriority(sector?.priority || "");
       } else {
-        // Al crear, usar icono por defecto y generar un color aleatorio
+        // Al crear, usar icono por defecto, generar un color aleatorio y resetear prioridad
         setIcon(DEFAULT_SECTOR_ICON);
         setColor(generateRandomColor());
+        setPriority("");
       }
       setError(null); // Limpiar errores al abrir el diálogo
     }
@@ -85,10 +95,16 @@ export function SectorForm({
 
     const formData = new FormData(e.currentTarget);
     const name = formData.get("name") as string;
+    const priorityValue = priority || (formData.get("priority") as string);
     const description = formData.get("description") as string | null;
 
     if (!name || name.trim() === "") {
       setError("El nombre del sector es requerido");
+      return;
+    }
+
+    if (!priorityValue || priorityValue.trim() === "") {
+      setError("La prioridad es requerida");
       return;
     }
 
@@ -97,6 +113,7 @@ export function SectorForm({
         setError(null);
         const actionFormData = new FormData();
         actionFormData.append("name", name.trim());
+        actionFormData.append("priority", priorityValue.trim());
         // Usar el icono seleccionado o el por defecto
         actionFormData.append("icon", icon || DEFAULT_SECTOR_ICON);
         // Usar el color seleccionado o generar uno aleatorio
@@ -127,11 +144,12 @@ export function SectorForm({
             if (formRef.current) {
               formRef.current.reset();
             }
-            // Al crear, usar icono por defecto y generar nuevo color aleatorio para la próxima vez
+            // Al crear, usar icono por defecto, generar nuevo color aleatorio y resetear prioridad para la próxima vez
             // Al editar, el useEffect actualizará los valores cuando se abra el diálogo de nuevo
             if (!isEditing) {
               setIcon(DEFAULT_SECTOR_ICON);
               setColor(generateRandomColor());
+              setPriority("");
             }
           } catch (err) {
             // Ignorar errores al resetear (puede ocurrir si el formulario ya fue desmontado)
@@ -196,6 +214,26 @@ export function SectorForm({
               <p className="text-xs text-muted-foreground">
                 Máximo 100 caracteres
               </p>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="priority">Prioridad *</Label>
+              <Select
+                value={priority}
+                onValueChange={setPriority}
+                required
+                disabled={isPending}
+              >
+                <SelectTrigger id="priority" className="w-full">
+                  <SelectValue placeholder="Selecciona una prioridad" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Alta">Alta</SelectItem>
+                  <SelectItem value="Media">Media</SelectItem>
+                  <SelectItem value="Baja">Baja</SelectItem>
+                </SelectContent>
+              </Select>
+              <input type="hidden" name="priority" value={priority} />
             </div>
 
             <div className="grid gap-2">
