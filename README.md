@@ -291,3 +291,8 @@ Despliega este proyecto para verlo en vivo: [Guía de Despliegue en Vercel](http
 ---
 
 ¡Gracias por explorar el Demo de Autenticación con Next.js! 🚀
+
+
+## License
+
+Proprietary, all rights reserved. See [LICENSE](LICENSE).
